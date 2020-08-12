@@ -6,6 +6,7 @@
 			<td v-for="value in array" :key=value.id>{{value}}</td>
 		</tr>
 	</table>
+	<button @click="editBoard">Press</button>
 </div>
 </template>
 
@@ -22,12 +23,19 @@ export default class Sudoku extends Vue
 		let k = 0;
 		for(let i = 0; i < 9; i++)
 		{
-			this.board[i] = [];
+			// this.board[i] = [];
+			this.board.push([]);
 			for(let j = 0; j < 9; j++)
 			{
-				this.board[i][j] = k++;
+				// this.board[i][j] = k++;
+				this.board[i].push(k++);
 			}
 		}
+	}
+
+	editBoard()
+	{
+		this.$set(this.board[0], 0, 5)
 	}
 }
 </script>
@@ -47,8 +55,10 @@ table
 }
 td
 {
-	border: 1px solid;
+	border: 1px solid black;
 	text-align: center;
 	padding: 18px;
+	font-size: 32px;
+	/* color: dodgerblue; */
 }
 </style>

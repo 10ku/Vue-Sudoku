@@ -2,16 +2,19 @@
 <div id="sudoku">
 	<p class="title">Sudoku</p>
 	<table>
-		<tr v-for="(array, index) in grid" :key=array.id :class="(index == 2 || index == 5) ? 'boldGridVert' : ''">
-			<td v-for="(value, index) in array" :key=value.id :class="(index == 2 || index == 5) ? 'boldGridHor' : ''">{{value ? value : ''}}</td>
+		<tr v-for="(array, index) in grid" :key=array.id :class="(index === 2 || index === 5) ? 'boldGridHor' : null">
+			<td v-for="(value, index) in array" :key=value.id :class="(index === 2 || index === 5) ? 'boldGridVert' : null">{{value ? value : null}}</td>
 		</tr>
 	</table>
+	<button @click="testHor3Button()">testHor3Button</button>
+	<button @click="testVert2Button()">testVert2Button</button>
+	<button @click="testSquare55Button()">testSquare55Button</button>
 </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-//import Grid from 'src/components/Grid.vue'
+import GridService from '../services/GridService';
 
 @Component
 export default class Sudoku extends Vue
@@ -28,7 +31,8 @@ export default class Sudoku extends Vue
 						[0,0,0,0,4,0,0,0,9]]; */
 
 	grid: number[][] = [];
-	// mynewclass = new Grid();
+	gridService = new GridService(this.grid)
+	
 
 	created()
 	{
@@ -37,15 +41,23 @@ export default class Sudoku extends Vue
 			this.grid.push([]);
 			for(let j = 0; j < 9; j++)
 			{
-				this.grid[i].push(0);
+				// this.grid[i].push(0);
+				this.grid[i].push(Math.floor(Math.random() * 9) + 1);
 			}
 		}
-		this.createGrid(this.grid);
 	}
 
-	private createGrid(grid: number[][])
+	private testHor3Button()
 	{
-		// this.grid[1].splice(1,1,21)
+		console.log(this.gridService.checkHorizontalOfIndex(3));
+	}
+	private testVert2Button()
+	{
+		console.log(this.gridService.checkVerticalOfIndex(2));
+	}
+	private testSquare55Button()
+	{
+		console.log(this.gridService.checkSquareOfIndex(8, 6));
 	}
 }
 </script>
@@ -74,17 +86,17 @@ td
 	width: 16px;
 	/* color: dodgerblue; */
 }
-td.boldGridHor
+tr.boldGridHor
 {
-	border-right: 4px solid black;
+	border-bottom: 4px solid black;
 }
 tr
 {
 	border-left: 4px solid black;
 	border-right: 4px solid black;
 }
-tr.boldGridVert
+td.boldGridVert
 {
-	border-bottom: 4px solid black;
+	border-right: 4px solid black;
 }
 </style>

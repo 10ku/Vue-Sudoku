@@ -7,6 +7,29 @@ export default class GridService
 		this.array2d = array2d;
 	}
 
+	initBoard()
+	{
+		for (let y = 0; y < 9; y++)
+		{
+			this.array2d.push([]);
+			for (let x = 0; x < 9; x++)
+			{
+				this.array2d[y].push(0);
+			}
+		}
+	}
+
+	zeroBoard()
+	{
+		for (let y = 0; y < 9; y++)
+		{
+			for (let x = 0; x < 9; x++)
+			{
+				this.array2d[y].splice(x, 1, 0);
+			}
+		}
+	}
+
 	checkHorizontalOfIndex(y: number): boolean
 	{
 		return this.isArrayUnique(this.array2d[y])
@@ -74,9 +97,11 @@ export default class GridService
 
 	createSudokuBoard()
 	{
+		this.zeroBoard();
 		this.fillSquaresDiagonally();
 		this.fillRemaining();
-		//this.removeCells(30);
+		// this.removeCells(52);
+		this.removeCells(44);
 	}
 
 	private fillSquaresDiagonally()
@@ -141,6 +166,9 @@ export default class GridService
 		let x = 0;
 		let y = 0;
 		let removed = 0;
+		let checks = 0;
+		let oldNum = 0;
+		let iterations = 0;
 
 		while (removed != n)
 		{
@@ -149,12 +177,38 @@ export default class GridService
 
 			if (this.array2d[y][x] !== 0)
 			{
-				this.array2d[y].splice(x, 1, 0);
-				this.array2d[8-y].splice(8-x, 1, 0);
-				removed += 2;
+				// console.log(Number(this.array2d[y].splice(x, 1, 0).toString()));
+				oldNum = Number(this.array2d[y].splice(x, 1, 0));
+				// this.array2d[8-y].splice(8-x, 1, 0);
+				// removed += 2;
+				for (let i = 1; i <= 9; i++)
+				{
+					if (this.checkAllForValue(x, y, i))
+					{
+						checks++;
+					}
+				}
+				if (checks > 1)
+				{
+					this.array2d[y].splice(x, 1, oldNum);
+				}
+				else
+				{
+					removed++;
+				}
+				checks = 0;
+			}
+			iterations++;
+
+			if (iterations === 10000)
+			{
+				console.log(iterations);
+				this.zeroBoard();
+				this.createSudokuBoard();
+				return;
 			}
 		}
-		// console.log(removed);
+		console.log(iterations);
 	}
 
 	private getShuffledArray(): number[]

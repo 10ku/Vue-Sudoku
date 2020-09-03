@@ -60,17 +60,7 @@ export default class Sudoku extends Vue
 
 	created()
 	{
-		for (let i = 0; i < 9; i++)
-		{
-			this.grid.push([]);
-			for (let j = 0; j < 9; j++)
-			{
-				this.grid[i].push(0);
-				// this.grid[i].push(Math.floor(Math.random() * 9) + 1);
-			}
-		}
-
-		// this.gridService
+		this.gridService.initBoard();
 	}
 
 	private testHor3Button()

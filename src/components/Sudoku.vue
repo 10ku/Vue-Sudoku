@@ -1,18 +1,24 @@
 <template>
 <div id="sudoku">
-	<p class="title">Sudoku</p>
-	<table>
-		<tr v-for="(array, index) in grid" :key=array.id :class="(index === 2 || index === 5) ? 'boldGridHor' : null">
-			<td v-for="(value, index) in array" :key=value.id :class="(index === 2 || index === 5) ? 'boldGridVert' : null">{{value ? value : null}}</td>
-		</tr>
-	</table>
-	<!-- <button @click="testHor3Button()">testHor3Button</button> -->
-	<!-- <button @click="testVert2Button()">testVert2Button</button> -->
-	<!-- <button @click="testSquare55Button()">testSquare55Button</button> -->
-	<button @click="createSudokuBoard()">createSudokuBoard</button>
-	<button @click="printSudokuBoard()">printSudokuBoard</button>
-	<!-- <button @click="testCheckAllForValue()">testCheckAllForValue</button> -->
-	<!-- <button @click="testGetShuffledArray()">testGetShuffledArray</button> -->
+	<div class="grid-container">
+		<div class="grid-item" @click="clearHighlight()"></div>
+		<div class="grid-item">
+			<p class="title" @click="clearHighlight()">Sudoku</p>
+			<table>
+				<tr v-for="(array, yIndex) in grid" :key=array.id :class="(yIndex % 3 === 0) ? 'boldGridHor' : null">
+					<td v-for="(value, xIndex) in array" :key=value.id @click="highlightSelection($event)" :id="'x' + xIndex + 'y' + yIndex" :class="(xIndex % 3 === 0) ? 'boldGridVert' : null">{{value !== 0 ? value : null}}</td>
+				</tr>
+			</table>
+			<!-- <button @click="testHor3Button()">testHor3Button</button> -->
+			<!-- <button @click="testVert2Button()">testVert2Button</button> -->
+			<!-- <button @click="testSquare55Button()">testSquare55Button</button> -->
+			<button @click="createSudokuBoard()">createSudokuBoard</button>
+			<button @click="printSudokuBoard()">printSudokuBoard</button>
+			<!-- <button @click="testCheckAllForValue()">testCheckAllForValue</button> -->
+			<!-- <button @click="testGetShuffledArray()">testGetShuffledArray</button> -->
+		</div>
+		<div class="grid-item" @click="clearHighlight()"></div>
+	</div>
 </div>
 </template>
 
@@ -56,7 +62,6 @@ export default class Sudoku extends Vue
 
 	grid: number[][] = [];
 	gridService = new GridService(this.grid)
-	
 
 	created()
 	{
@@ -92,10 +97,57 @@ export default class Sudoku extends Vue
 		console.log(this.gridService.checkAllForValue(3, 0, 4));
 		// console.log(this.grid.flat().indexOf(0));
 	}
+
+	private highlightSelection(event: Event)
+	{
+		const selectedElement = event.target as Element;
+		let currElement: Element;
+		const selectedElementId = selectedElement.id;
+		const selectedX = selectedElementId.charAt(1);
+		const selectedY = selectedElementId.charAt(3);
+
+		this.clearHighlight();
+		
+		for (let i = 0; i < 9; i++)
+		{
+			currElement = document.getElementById("x" + i + "y" + selectedY) as Element;
+			currElement.classList.add("additionalHighlight");
+		}
+		
+		for (let i = 0; i < 9; i++)
+		{
+			currElement = document.getElementById("x" + selectedX + "y" + i) as Element;
+			currElement.classList.add("additionalHighlight");
+		}
+
+		console.log(selectedElement.id);
+		selectedElement.classList.remove("additionalHighlight");
+		selectedElement.classList.add("highlight");
+	}
+
+	private clearHighlight()
+	{
+		const numElements = document.getElementsByTagName("td").length;
+
+		for (let i = 0; i < numElements; i++)
+		{
+			document.getElementsByTagName("td")[i].classList.remove("highlight", "additionalHighlight");
+		}
+	}
 }
 </script>
 
 <style scoped>
+div.grid-container
+{
+  display: grid;
+  grid-template-columns: 30% auto 30%;
+}
+div.grid-item
+{
+  font-size: 32px;
+  text-align: center;
+}
 p.title
 {
 	text-align: center;
@@ -104,7 +156,8 @@ p.title
 table
 {
 	border-collapse: collapse;
-	width: 50%;
+	border: 4px solid black;
+	width: 100%;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -121,15 +174,18 @@ td
 }
 tr.boldGridHor
 {
-	border-bottom: 4px solid black;
+	border-top: 4px solid black;
 }
-tr
+td.highlight
 {
-	border-left: 4px solid black;
-	border-right: 4px solid black;
+	background-color: steelblue;
+}
+td.additionalHighlight
+{
+	background-color: lightsteelblue;
 }
 td.boldGridVert
 {
-	border-right: 4px solid black;
+	border-left: 4px solid black;
 }
 </style>

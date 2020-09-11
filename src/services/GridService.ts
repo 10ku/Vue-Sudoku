@@ -101,7 +101,8 @@ export default class GridService
 		this.fillSquaresDiagonally();
 		this.fillRemaining();
 		// this.removeCells(52);
-		this.removeCells(44);
+		// this.removeCells(49);
+		this.removeCells(40);
 	}
 
 	private fillSquaresDiagonally()
@@ -136,17 +137,22 @@ export default class GridService
 
 	private fillRemaining()
 	{
+		let shuffledArray: number[] = [];
+		let poppedElement = 0;
+
 		for (let y = 0; y < 9; y++)
 		{
 			for (let x = 0; x < 9; x++)
 			{
 				if (this.array2d[y][x] === 0)
 				{
+					shuffledArray = this.getShuffledArray();
 					for (let i = 1; i <= 9; i++)
 					{
-						if (this.checkAllForValue(x, y, i))
+						poppedElement = shuffledArray.pop() as number;
+						if (this.checkAllForValue(x, y, poppedElement))
 						{
-							this.array2d[y].splice(x, 1, i);
+							this.array2d[y].splice(x, 1, poppedElement);
 							this.fillRemaining()
 							if(this.array2d.flat().indexOf(0) === -1)
 							{
@@ -200,7 +206,7 @@ export default class GridService
 			}
 			iterations++;
 
-			if (iterations === 10000)
+			if (iterations === 500)
 			{
 				console.log(iterations);
 				this.zeroBoard();

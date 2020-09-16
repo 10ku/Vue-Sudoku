@@ -99,10 +99,15 @@ export default class GridService
 	{
 		this.zeroBoard();
 		this.fillSquaresDiagonally();
-		this.fillRemaining();
+		this.fillRemaining(this.array2d);
 		// this.removeCells(52);
 		// this.removeCells(49);
 		this.removeCells(40);
+	}
+
+	solveSudokuBoard(gridToSolve: number[][])
+	{
+		this.fillRemaining(gridToSolve);
 	}
 
 	private fillSquaresDiagonally()
@@ -135,7 +140,7 @@ export default class GridService
 		}
 	}
 
-	private fillRemaining()
+	private fillRemaining(gridToFill: number[][])
 	{
 		let shuffledArray: number[] = [];
 		let poppedElement = 0;
@@ -144,7 +149,7 @@ export default class GridService
 		{
 			for (let x = 0; x < 9; x++)
 			{
-				if (this.array2d[y][x] === 0)
+				if (gridToFill[y][x] === 0)
 				{
 					shuffledArray = this.getShuffledArray();
 					for (let i = 1; i <= 9; i++)
@@ -152,15 +157,15 @@ export default class GridService
 						poppedElement = shuffledArray.pop() as number;
 						if (this.checkAllForValue(x, y, poppedElement))
 						{
-							this.array2d[y].splice(x, 1, poppedElement);
-							this.fillRemaining()
-							if(this.array2d.flat().indexOf(0) === -1)
+							gridToFill[y].splice(x, 1, poppedElement);
+							this.fillRemaining(gridToFill)
+							if(gridToFill.flat().indexOf(0) === -1)
 							{
 								return;
 							}
 						}
 					}
-					this.array2d[y].splice(x, 1, 0);
+					gridToFill[y].splice(x, 1, 0);
 					return;
 				}
 			}

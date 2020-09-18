@@ -1,20 +1,28 @@
 export default class GridService
 {
+	initialArray2d: number[][] = [];
 	array2d: number[][] = [];
+	filledArray2d: number[][] = [];
 
-	constructor(array2d: number[][])
+	constructor(initialArray2d: number[][], array2d: number[][], filledArray2d: number[][])
 	{
+		this.initialArray2d = initialArray2d;
 		this.array2d = array2d;
+		this.filledArray2d = filledArray2d;
 	}
 
 	initBoard()
 	{
 		for (let y = 0; y < 9; y++)
 		{
+			this.initialArray2d.push([]);
 			this.array2d.push([]);
+			this.filledArray2d.push([]);
 			for (let x = 0; x < 9; x++)
 			{
+				this.initialArray2d[y].push(0);
 				this.array2d[y].push(0);
+				this.filledArray2d[y].push(0);
 			}
 		}
 	}
@@ -99,15 +107,17 @@ export default class GridService
 	{
 		this.zeroBoard();
 		this.fillSquaresDiagonally();
-		this.fillRemaining(this.array2d);
+		this.fillRemaining();
 		// this.removeCells(52);
 		// this.removeCells(49);
-		this.removeCells(40);
+		this.copyArray(this.filledArray2d, this.array2d);
+		this.removeCells(45);
+		this.copyArray(this.initialArray2d, this.array2d);
 	}
 
-	solveSudokuBoard(gridToSolve: number[][])
+	solveSudokuBoard()
 	{
-		this.fillRemaining(gridToSolve);
+		this.copyArray(this.array2d, this.filledArray2d);
 	}
 
 	private fillSquaresDiagonally()
@@ -140,7 +150,7 @@ export default class GridService
 		}
 	}
 
-	private fillRemaining(gridToFill: number[][])
+	private fillRemaining()
 	{
 		let shuffledArray: number[] = [];
 		let poppedElement = 0;
@@ -149,7 +159,7 @@ export default class GridService
 		{
 			for (let x = 0; x < 9; x++)
 			{
-				if (gridToFill[y][x] === 0)
+				if (this.array2d[y][x] === 0)
 				{
 					shuffledArray = this.getShuffledArray();
 					for (let i = 1; i <= 9; i++)
@@ -157,15 +167,15 @@ export default class GridService
 						poppedElement = shuffledArray.pop() as number;
 						if (this.checkAllForValue(x, y, poppedElement))
 						{
-							gridToFill[y].splice(x, 1, poppedElement);
-							this.fillRemaining(gridToFill)
-							if(gridToFill.flat().indexOf(0) === -1)
+							this.array2d[y].splice(x, 1, poppedElement);
+							this.fillRemaining()
+							if(this.array2d.flat().indexOf(0) === -1)
 							{
 								return;
 							}
 						}
 					}
-					gridToFill[y].splice(x, 1, 0);
+					this.array2d[y].splice(x, 1, 0);
 					return;
 				}
 			}
@@ -213,13 +223,12 @@ export default class GridService
 
 			if (iterations === 500)
 			{
-				console.log(iterations);
-				this.zeroBoard();
+				// console.log(iterations);
 				this.createSudokuBoard();
 				return;
 			}
 		}
-		console.log(iterations);
+		// console.log(iterations);
 	}
 
 	private getShuffledArray(): number[]
@@ -236,5 +245,16 @@ export default class GridService
 		}
 
 		return array;
+	}
+
+	copyArray(arrayTo: number[][], arrayFrom: number[][])
+	{
+		for (let y = 0; y < 9; y++)
+		{
+			for (let x = 0; x < 9; x++)
+			{
+				arrayTo[y].splice(x, 1, arrayFrom[y][x]);
+			}
+		}
 	}
 }

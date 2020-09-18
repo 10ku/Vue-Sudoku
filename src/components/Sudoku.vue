@@ -9,14 +9,10 @@
 					<td v-for="(value, xIndex) in array" :key=value.id @click="highlightSelection($event)" :id="'x' + xIndex + 'y' + yIndex" :class="(xIndex % 3 === 0) ? 'boldGridVert' : null">{{value !== 0 ? value : null}}</td>
 				</tr>
 			</table>
-			<!-- <button @click="testHor3Button()">testHor3Button</button> -->
-			<!-- <button @click="testVert2Button()">testVert2Button</button> -->
-			<!-- <button @click="testSquare55Button()">testSquare55Button</button> -->
 			<button @click="createSudokuBoard()">createSudokuBoard</button>
 			<button @click="checkSudokuBoard()">checkSudokuBoard</button>
+			<button @click="giveSolution()">giveSolution</button>
 			<button @click="printSudokuBoard()">printSudokuBoard</button>
-			<!-- <button @click="testCheckAllForValue()">testCheckAllForValue</button> -->
-			<!-- <button @click="testGetShuffledArray()">testGetShuffledArray</button> -->
 		</div>
 		<div class="grid-item" @click="clearHighlight()"></div>
 	</div>
@@ -41,71 +37,57 @@ export default class Sudoku extends Vue
 						[0,0,2,0,1,0,0,0,0],
 						[0,0,0,0,4,0,0,0,9]]; */
 
-	/* grid: number[][] = [[5,3,4,6,7,8,9,1,2],
-						[6,7,2,1,9,5,3,4,8],
-						[1,9,8,3,4,2,5,6,7],
-						[8,5,9,7,6,1,4,2,3],
-						[4,2,6,8,5,3,7,9,1],
-						[7,1,3,9,2,4,8,5,6],
-						[9,6,1,5,3,7,2,8,4],
-						[2,8,7,4,1,9,6,3,5],
-						[3,4,5,2,8,6,1,7,9]]; */
-
-	/* grid: number[][] = [[5,3,4,6,7,8,9,1,2],
-						[6,7,2,1,9,5,3,4,8],
-						[1,9,8,3,4,2,5,6,7],
-						[8,5,9,7,6,1,4,2,3],
-						[4,2,6,8,5,3,7,9,1],
-						[7,1,3,9,0,4,8,5,6],
-						[9,6,1,5,3,7,2,8,4],
-						[2,8,7,4,1,9,6,3,5],
-						[3,4,5,2,0,0,1,7,0]]; */
+	/* grid: number[][] = [[2,0,9,6,1,7,0,8,0],
+						[0,0,0,0,2,0,9,0,1],
+						[0,1,6,4,0,0,2,0,3],
+						[0,0,0,3,5,4,0,9,8],
+						[7,0,4,0,0,8,0,5,0],
+						[8,0,0,0,9,0,1,4,0],
+						[0,0,5,2,7,6,0,3,0],
+						[3,6,7,0,0,0,0,0,5],
+						[0,4,0,8,0,5,0,1,7]]; */
 
 	initialGrid: number[][] = [];
 	grid: number[][] = [];
 	solvedGrid: number[][] = [];
-	gridService = new GridService(this.grid)
+	gridService = new GridService(this.initialGrid, this.grid, this.solvedGrid)
 
 	created()
 	{
 		this.gridService.initBoard();
 	}
 
-	private testHor3Button()
-	{
-		console.log(this.gridService.checkHorizontalOfIndex(3));
-	}
-	private testVert2Button()
-	{
-		console.log(this.gridService.checkVerticalOfIndex(2));
-	}
-	private testSquare55Button()
-	{
-		console.log(this.gridService.checkSquareOfIndex(8, 6));
-	}
 	private createSudokuBoard()
 	{
 		this.gridService.createSudokuBoard();
-		this.initialGrid = JSON.parse(JSON.stringify(this.grid))
-		this.solvedGrid = JSON.parse(JSON.stringify(this.grid))
-		this.gridService.solveSudokuBoard(this.solvedGrid);
+		this.clearUnderline();
 	}
+
 	private checkSudokuBoard()
 	{
-		//
+		if (this.isGridUndefined())
+		{
+			return;
+		}
+
+		this.addColoredUnderlineToEditableCells();
 	}
+
+	private giveSolution()
+	{
+		if (this.isGridUndefined())
+		{
+			return;
+		}
+
+		this.gridService.solveSudokuBoard();
+		this.clearUnderline();
+		this.addColoredUnderlineToEditableCells();
+	}
+
 	private printSudokuBoard()
 	{
-		console.log(this.grid.flat().toString());
-	}
-	/* private testGetShuffledArray()
-	{
-		console.log(this.gridService.getShuffledArray().toString());
-	} */
-	private testCheckAllForValue()
-	{
-		console.log(this.gridService.checkAllForValue(3, 0, 4));
-		// console.log(this.grid.flat().indexOf(0));
+		console.log(this.initialGrid.flat().toString());
 	}
 
 	private highlightSelection(event: Event)
@@ -130,7 +112,6 @@ export default class Sudoku extends Vue
 			currElement.classList.add("additionalHighlight");
 		}
 
-		// console.log(selectedElement.id);
 		selectedElement.classList.remove("additionalHighlight");
 		selectedElement.classList.add("highlight");
 	}
@@ -144,6 +125,16 @@ export default class Sudoku extends Vue
 			document.getElementsByTagName("td")[i].classList.remove("highlight", "additionalHighlight");
 		}
 	}
+	
+	private clearUnderline()
+	{
+		const numElements = document.getElementsByTagName("td").length;
+
+		for (let i = 0; i < numElements; i++)
+		{
+			document.getElementsByTagName("td")[i].classList.remove("playerNumber", "playerNumberCorrect", "playerNumberWrong");
+		}
+	}
 
 	private cellInput(event: KeyboardEvent)
 	{
@@ -153,10 +144,46 @@ export default class Sudoku extends Vue
 		const selectedY = Number(selectedElementId.charAt(3));
 		const chosenNumber = Number(event.key.charAt(0));
 
+		if (this.isGridUndefined())
+		{
+			return;
+		}
+
 		if (Number.isInteger(chosenNumber) === true && this.initialGrid[selectedY][selectedX] === 0)
 		{
 			this.grid[selectedY].splice(selectedX, 1, Number(event.key.charAt(0)));
 			selectedElement.classList.add("playerNumber");
+			selectedElement.classList.remove("playerNumberCorrect", "playerNumberWrong");
+		}
+	}
+
+	private isGridUndefined(): boolean
+	{
+		return this.initialGrid[0] === undefined;
+	}
+
+	private addColoredUnderlineToEditableCells()
+	{
+		let currElement: Element;
+
+		for (let y = 0; y < 9; y++)
+		{
+			for (let x = 0; x < 9; x++)
+			{
+				if (this.initialGrid[y][x] === 0 && this.grid[y][x] !== 0)
+				{
+					if (this.grid[y][x] === this.solvedGrid[y][x])
+					{
+						currElement = document.getElementById("x" + x + "y" + y) as Element;
+						currElement.classList.add("playerNumber", "playerNumberCorrect");
+					}
+					else
+					{
+						currElement = document.getElementById("x" + x + "y" + y) as Element;
+						currElement.classList.add("playerNumber", "playerNumberWrong");
+					}
+				}
+			}
 		}
 	}
 }
@@ -225,5 +252,9 @@ td.highlight
 td.additionalHighlight
 {
 	background-color: lightsteelblue;
+}
+td.zzz
+{
+	background-color: pink;
 }
 </style>

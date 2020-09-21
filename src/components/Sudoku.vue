@@ -5,8 +5,8 @@
 		<div class="grid-item">
 			<p class="title" @click="clearHighlight()">Sudoku</p>
 			<table @keyup.esc="clearHighlight()" @keyup="cellInput($event)" tabindex="0">
-				<tr v-for="(array, yIndex) in grid" :key=array.id :class="(yIndex % 3 === 0) ? 'boldGridHor' : null">
-					<td v-for="(value, xIndex) in array" :key=value.id @click="highlightSelection($event)" :id="'x' + xIndex + 'y' + yIndex" :class="(xIndex % 3 === 0) ? 'boldGridVert' : null">{{value !== 0 ? value : null}}</td>
+				<tr v-for="(array, yIndex) in sudoku" :key=array.id :class="(yIndex % 3 === 0) ? 'horizontalBorder' : null">
+					<td v-for="(value, xIndex) in array" :key=value.id @click="highlightSelection($event)" :id="'x' + xIndex + 'y' + yIndex" :class="(xIndex % 3 === 0) ? 'verticalBorder' : null">{{value !== 0 ? value : null}}</td>
 				</tr>
 			</table>
 			<button @click="createSudokuBoard()">createSudokuBoard</button>
@@ -27,7 +27,7 @@ import GridService from '../services/GridService';
 export default class Sudoku extends Vue
 {
 	//Rico Alan Sudoku
-	/* grid: number[][] = [[0,0,0,0,0,0,0,0,0],
+	/* sudoku: number[][] = [[0,0,0,0,0,0,0,0,0],
 						[0,0,0,0,0,3,0,8,5],
 						[0,0,1,0,2,0,0,0,0],
 						[0,0,0,5,0,7,0,0,0],
@@ -37,7 +37,7 @@ export default class Sudoku extends Vue
 						[0,0,2,0,1,0,0,0,0],
 						[0,0,0,0,4,0,0,0,9]]; */
 
-	/* grid: number[][] = [[2,0,9,6,1,7,0,8,0],
+	/* sudoku: number[][] = [[2,0,9,6,1,7,0,8,0],
 						[0,0,0,0,2,0,9,0,1],
 						[0,1,6,4,0,0,2,0,3],
 						[0,0,0,3,5,4,0,9,8],
@@ -47,14 +47,14 @@ export default class Sudoku extends Vue
 						[3,6,7,0,0,0,0,0,5],
 						[0,4,0,8,0,5,0,1,7]]; */
 
-	initialGrid: number[][] = [];
-	grid: number[][] = [];
-	solvedGrid: number[][] = [];
-	gridService = new GridService(this.initialGrid, this.grid, this.solvedGrid)
+	initialSudoku: number[][] = [];
+	sudoku: number[][] = [];
+	solvedSudoku: number[][] = [];
+	gridService = new GridService(this.initialSudoku, this.sudoku, this.solvedSudoku)
 
 	created()
 	{
-		this.gridService.initBoard();
+		this.gridService.initGrids();
 	}
 
 	private createSudokuBoard()
@@ -65,7 +65,7 @@ export default class Sudoku extends Vue
 
 	private checkSudokuBoard()
 	{
-		if (this.isGridUndefined())
+		if (this.isSudokuUndefined())
 		{
 			return;
 		}
@@ -75,7 +75,7 @@ export default class Sudoku extends Vue
 
 	private giveSolution()
 	{
-		if (this.isGridUndefined())
+		if (this.isSudokuUndefined())
 		{
 			return;
 		}
@@ -87,7 +87,7 @@ export default class Sudoku extends Vue
 
 	private printSudokuBoard()
 	{
-		console.log(this.initialGrid.flat().toString());
+		console.log(this.initialSudoku.flat().toString());
 	}
 
 	private highlightSelection(event: Event)
@@ -144,22 +144,22 @@ export default class Sudoku extends Vue
 		const selectedY = Number(selectedElementId.charAt(3));
 		const chosenNumber = Number(event.key.charAt(0));
 
-		if (this.isGridUndefined())
+		if (this.isSudokuUndefined())
 		{
 			return;
 		}
 
-		if (Number.isInteger(chosenNumber) === true && this.initialGrid[selectedY][selectedX] === 0)
+		if (Number.isInteger(chosenNumber) === true && this.initialSudoku[selectedY][selectedX] === 0)
 		{
-			this.grid[selectedY].splice(selectedX, 1, Number(event.key.charAt(0)));
+			this.sudoku[selectedY].splice(selectedX, 1, Number(event.key.charAt(0)));
 			selectedElement.classList.add("playerNumber");
 			selectedElement.classList.remove("playerNumberCorrect", "playerNumberWrong");
 		}
 	}
 
-	private isGridUndefined(): boolean
+	private isSudokuUndefined(): boolean
 	{
-		return this.initialGrid[0] === undefined;
+		return this.initialSudoku[0] === undefined;
 	}
 
 	private addColoredUnderlineToEditableCells()
@@ -170,9 +170,9 @@ export default class Sudoku extends Vue
 		{
 			for (let x = 0; x < 9; x++)
 			{
-				if (this.initialGrid[y][x] === 0 && this.grid[y][x] !== 0)
+				if (this.initialSudoku[y][x] === 0 && this.sudoku[y][x] !== 0)
 				{
-					if (this.grid[y][x] === this.solvedGrid[y][x])
+					if (this.sudoku[y][x] === this.solvedSudoku[y][x])
 					{
 						currElement = document.getElementById("x" + x + "y" + y) as Element;
 						currElement.classList.add("playerNumber", "playerNumberCorrect");
@@ -222,13 +222,12 @@ td
 	max-width: 16px;
 	height: 38px;
 	width: 16px;
-	/* color: dodgerblue; */
 }
-tr.boldGridHor
+tr.horizontalBorder
 {
 	border-top: 4px solid black;
 }
-td.boldGridVert
+td.verticalBorder
 {
 	border-left: 4px solid black;
 }
@@ -252,9 +251,5 @@ td.highlight
 td.additionalHighlight
 {
 	background-color: lightsteelblue;
-}
-td.zzz
-{
-	background-color: pink;
 }
 </style>

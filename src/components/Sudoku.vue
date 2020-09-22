@@ -4,6 +4,7 @@
 		<div class="grid-item" @click="clearHighlight()"></div>
 		<div class="grid-item">
 			<p class="title" @click="clearHighlight()">Sudoku</p>
+			<!-- tabindex needed to make table active for key events -->
 			<table @keyup.esc="clearHighlight()" @keyup="cellInput($event)" tabindex="0">
 				<tr v-for="(array, yIndex) in sudoku" :key=array.id :class="(yIndex % 3 === 0) ? 'horizontalBorder' : null">
 					<td v-for="(value, xIndex) in array" :key=value.id @click="highlightSelection($event)" :id="'x' + xIndex + 'y' + yIndex" :class="(xIndex % 3 === 0) ? 'verticalBorder' : null">{{value !== 0 ? value : null}}</td>

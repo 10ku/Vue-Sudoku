@@ -33,7 +33,7 @@ export default class GridService
 		this.fillSquaresDiagonally();
 		this.fillRemaining();
 		this.copyGrid(this.filledGrid, this.grid);
-		this.removeCells(45);
+		this.removeCells(41);
 		this.copyGrid(this.initialGrid, this.grid);
 	}
 

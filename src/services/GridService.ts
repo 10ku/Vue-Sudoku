@@ -27,80 +27,6 @@ export default class GridService
 		}
 	}
 
-	private zeroGrid()
-	{
-		for (let y = 0; y < 9; y++)
-		{
-			for (let x = 0; x < 9; x++)
-			{
-				this.grid[y].splice(x, 1, 0);
-			}
-		}
-	}
-
-	private checkHorizontalOfIndex(y: number): boolean
-	{
-		return this.isArrayUnique(this.grid[y])
-	}
-
-	private checkVerticalOfIndex(x: number): boolean
-	{
-		const array: number[] = [];
-
-		for (let y = 0; y < 9; y++)
-		{
-			array.push(this.grid[y][x]);
-		}
-
-		return this.isArrayUnique(array);
-	}
-
-	private checkSquareOfIndex(x: number, y: number): boolean
-	{
-		const xRoot = x - (x % 3);
-		let xRootIndex = xRoot;
-		let yRoot = y - (y % 3);
-		const array: number[] = [];
-
-		for (let y = 0; y < 3; y++)
-		{
-			for (let x = 0; x < 3; x++)
-			{
-				array.push(this.grid[yRoot][xRootIndex]);
-				xRootIndex++;
-			}
-			xRootIndex = xRoot;
-			yRoot++;
-		}
-
-		return this.isArrayUnique(array);
-	}
-
-	private checkAllForValue(x: number, y: number, n: number): boolean
-	{
-		let isValid = false;
-
-		this.grid[y].splice(x, 1, n);
-
-		if ((this.checkHorizontalOfIndex(y) === false) || (this.checkVerticalOfIndex(x) === false) || (this.checkSquareOfIndex(x, y) === false))
-		{
-			isValid = false;
-		}
-		else
-		{
-			isValid = true;
-		}
-
-		this.grid[y].splice(x, 1, 0);
-		return isValid;
-	}
-
-	private isArrayUnique(array: number[]): boolean
-	{
-		const filteredArray = array.filter(value => value !== 0);
-		return new Set(filteredArray).size === filteredArray.length;
-	}
-
 	createSudokuBoard()
 	{
 		this.zeroGrid();
@@ -114,6 +40,17 @@ export default class GridService
 	solveSudokuBoard()
 	{
 		this.copyGrid(this.grid, this.filledGrid);
+	}
+
+	private zeroGrid()
+	{
+		for (let y = 0; y < 9; y++)
+		{
+			for (let x = 0; x < 9; x++)
+			{
+				this.grid[y].splice(x, 1, 0);
+			}
+		}
 	}
 
 	private fillSquaresDiagonally()
@@ -222,6 +159,63 @@ export default class GridService
 		}
 	}
 
+	private checkHorizontalOfIndex(y: number): boolean
+	{
+		return this.isArrayUnique(this.grid[y])
+	}
+
+	private checkVerticalOfIndex(x: number): boolean
+	{
+		const array: number[] = [];
+
+		for (let y = 0; y < 9; y++)
+		{
+			array.push(this.grid[y][x]);
+		}
+
+		return this.isArrayUnique(array);
+	}
+
+	private checkSquareOfIndex(x: number, y: number): boolean
+	{
+		const xRoot = x - (x % 3);
+		let xRootIndex = xRoot;
+		let yRoot = y - (y % 3);
+		const array: number[] = [];
+
+		for (let y = 0; y < 3; y++)
+		{
+			for (let x = 0; x < 3; x++)
+			{
+				array.push(this.grid[yRoot][xRootIndex]);
+				xRootIndex++;
+			}
+			xRootIndex = xRoot;
+			yRoot++;
+		}
+
+		return this.isArrayUnique(array);
+	}
+
+	private checkAllForValue(x: number, y: number, n: number): boolean
+	{
+		let isValid = false;
+
+		this.grid[y].splice(x, 1, n);
+
+		if ((this.checkHorizontalOfIndex(y) === false) || (this.checkVerticalOfIndex(x) === false) || (this.checkSquareOfIndex(x, y) === false))
+		{
+			isValid = false;
+		}
+		else
+		{
+			isValid = true;
+		}
+
+		this.grid[y].splice(x, 1, 0);
+		return isValid;
+	}
+
 	private getShuffledArray(): number[]
 	{
 		const array: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -236,6 +230,12 @@ export default class GridService
 		}
 
 		return array;
+	}
+
+	private isArrayUnique(array: number[]): boolean
+	{
+		const filteredArray = array.filter(value => value !== 0);
+		return new Set(filteredArray).size === filteredArray.length;
 	}
 
 	private copyGrid(arrayTo: number[][], arrayFrom: number[][])

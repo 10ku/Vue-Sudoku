@@ -91,6 +91,27 @@ export default class Sudoku extends Vue
 		console.log(this.initialSudoku.flat().toString());
 	}
 
+	private cellInput(event: KeyboardEvent)
+	{
+		const selectedElement = document.getElementsByClassName("highlight")[0];
+		const selectedElementId = selectedElement.id;
+		const selectedX = Number(selectedElementId.charAt(1));
+		const selectedY = Number(selectedElementId.charAt(3));
+		const chosenNumber = Number(event.key.charAt(0));
+
+		if (this.isSudokuUndefined())
+		{
+			return;
+		}
+
+		if (Number.isInteger(chosenNumber) === true && this.initialSudoku[selectedY][selectedX] === 0)
+		{
+			this.sudoku[selectedY].splice(selectedX, 1, Number(event.key.charAt(0)));
+			selectedElement.classList.add("playerNumber");
+			selectedElement.classList.remove("playerNumberCorrect", "playerNumberWrong");
+		}
+	}
+
 	private highlightSelection(event: Event)
 	{
 		const selectedElement = event.target as Element;
@@ -126,42 +147,6 @@ export default class Sudoku extends Vue
 			document.getElementsByTagName("td")[i].classList.remove("highlight", "additionalHighlight");
 		}
 	}
-	
-	private clearUnderline()
-	{
-		const numElements = document.getElementsByTagName("td").length;
-
-		for (let i = 0; i < numElements; i++)
-		{
-			document.getElementsByTagName("td")[i].classList.remove("playerNumber", "playerNumberCorrect", "playerNumberWrong");
-		}
-	}
-
-	private cellInput(event: KeyboardEvent)
-	{
-		const selectedElement = document.getElementsByClassName("highlight")[0];
-		const selectedElementId = selectedElement.id;
-		const selectedX = Number(selectedElementId.charAt(1));
-		const selectedY = Number(selectedElementId.charAt(3));
-		const chosenNumber = Number(event.key.charAt(0));
-
-		if (this.isSudokuUndefined())
-		{
-			return;
-		}
-
-		if (Number.isInteger(chosenNumber) === true && this.initialSudoku[selectedY][selectedX] === 0)
-		{
-			this.sudoku[selectedY].splice(selectedX, 1, Number(event.key.charAt(0)));
-			selectedElement.classList.add("playerNumber");
-			selectedElement.classList.remove("playerNumberCorrect", "playerNumberWrong");
-		}
-	}
-
-	private isSudokuUndefined(): boolean
-	{
-		return this.initialSudoku[0] === undefined;
-	}
 
 	private addColoredUnderlineToEditableCells()
 	{
@@ -186,6 +171,21 @@ export default class Sudoku extends Vue
 				}
 			}
 		}
+	}
+	
+	private clearUnderline()
+	{
+		const numElements = document.getElementsByTagName("td").length;
+
+		for (let i = 0; i < numElements; i++)
+		{
+			document.getElementsByTagName("td")[i].classList.remove("playerNumber", "playerNumberCorrect", "playerNumberWrong");
+		}
+	}
+
+	private isSudokuUndefined(): boolean
+	{
+		return this.initialSudoku[0] === undefined;
 	}
 }
 </script>

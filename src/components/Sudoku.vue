@@ -9,10 +9,10 @@
 					<td v-for="(value, xIndex) in array" :key=value.id @click="highlightSelection($event)" :id="'x' + xIndex + 'y' + yIndex" :class="(xIndex % 3 === 0) ? 'verticalBorder' : null">{{value !== 0 ? value : null}}</td>
 				</tr>
 			</table>
-			<button @click="createSudokuBoard()">createSudokuBoard</button>
-			<button @click="checkSudokuBoard()">checkSudokuBoard</button>
-			<button @click="giveSolution()">giveSolution</button>
-			<button @click="printSudokuBoard()">printSudokuBoard</button>
+			<button @click="createSudokuBoard()">Generate Sudoku</button>
+			<button @click="checkSudokuBoard()">Check Sudoku</button>
+			<button @click="giveSolution()">Give Solution</button>
+			<button @click="printSudokuBoard()">Print Sudoku To Console</button>
 		</div>
 		<div class="grid-item" @click="clearHighlight()"></div>
 	</div>
